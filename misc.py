@@ -8,7 +8,7 @@ def head(a: dict, i: int) -> dict:
 
 
 # Draws the graph in a safe fashion, with optional coloring and persistent layout parameters
-def drawColored(G: nx.Graph, coloring: dict=None, pos: nx.layout=None):
+def draw(G: nx.Graph, coloring: dict=None, pos: nx.layout=None):
 
     # Ensure layout exists
     if pos is None:
