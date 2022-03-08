@@ -11,6 +11,8 @@
 */.virtual_documents/*
 bigdata
 */bigdata/*
+__pycache__
+*/__pycache__/*
 
 # IPython
 profile_default/
