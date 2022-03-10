@@ -86,6 +86,16 @@ def combineColoringsStable(colorings, delta: int):
     # Return combined coloring
     return d
 
+# Returns the number of recolors between two coloring dictionaries
+# Does not count adding a new node as a recolor
+def numberOfRecolors(c1: dict, c2: dict) -> int:
+    rc = 0
+    for key in c1.keys():
+        if key in c2.keys():
+            if c1[key] != c2[key]:
+                rc += 1
+    return rc
+
 # Function to read the reddit database from the text file
 # Access edges and vertices using misc.edges and misc.vertices
 def readRedditData():
