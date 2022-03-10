@@ -38,6 +38,13 @@ def numberOfColors(coloring: dict) -> int:
         color_list.append(coloring.get(key))
     return len(set(color_list))
 
+# Find maximum degree of G
+def getMaxDegree(G):
+    maxDeg = 0
+    degreeTuples = list(G.degree(list(G.nodes())))
+    for tuple in degreeTuples:
+        maxDeg = max(maxDeg, tuple[1])
+    return maxDeg
 
 # Subroutine for combineColorings that increases all values in a dictionary by an integer
 # Note: modifies the original dictionary passed as parameter!
