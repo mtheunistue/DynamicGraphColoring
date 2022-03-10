@@ -30,6 +30,7 @@ class BigBucketAlgo:
     def __init__(self, d):
         self.G = nx.Graph()  # The complete graph
         self.d = d           # Amount of levels
+        self.nr = 0          # Initialize nr to 0
         self.staticColoring = {}  # Coloring at any moment
         self.bucketLevels = []
         self.resetBuckets(self.G)
@@ -57,8 +58,8 @@ class BigBucketAlgo:
     # Creates brand new buckets with the correct sizes
     def resetBuckets(self, G: nx.Graph):
         nx.set_node_attributes(G, None, 'bucket')   # Reset all bucket references in G to None
-        nr = G.number_of_nodes()    # Number of vertices in G
-        s = math.ceil(pow(nr, 1/self.d)) # Amount of buckets per level
+        self.nr = G.number_of_nodes()    # Number of vertices in G
+        s = math.ceil(pow(self.nr, 1/self.d)) # Amount of buckets per level
         s = max(1, s)               # To allow the algorithm to work with empty graphs as well
 
         # Create d levels of s buckets each, with capacity s^i per bucket, where i the level of the bucket
@@ -67,7 +68,7 @@ class BigBucketAlgo:
             bucketLevel = []
             bucketLevel.append(Bucket(s, pow(s, level), level))
             self.bucketLevels.append(bucketLevel)
-        self.bucketLevels.append([Bucket(s, nr, self.d)])
+        self.bucketLevels.append([Bucket(s, self.nr, self.d)])
         
         self.staticColoring = nx.coloring.greedy_color(G)
         
@@ -150,7 +151,7 @@ class BigBucketAlgo:
         for bucketLevel in self.bucketLevels:
             for bucket in bucketLevel:
                 bucketColorings.append(bucket.coloring)
-        combinedColoring = misc.combineColorings(bucketColorings)   
+        combinedColoring = misc.combineColoringsStable(bucketColorings, self.nr)   
         return combinedColoring     
 
 

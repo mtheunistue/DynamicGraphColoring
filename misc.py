@@ -64,6 +64,27 @@ def combineColorings(colorings):
     # Return combined coloring
     return d
 
+# Combines different coloring dictionaries by incrementing color values
+# Intuitively this gives each coloring a unique set of colors to use
+# This variation takes delta as parameter, which is the upper bound on the colors each subcoloring should be allowed to use
+# By combining the colorings in this way, other subcolorings are not affected by changes in other subcolorings, making it more stable
+def combineColoringsStable(colorings, delta: int):
+    # Initialize incremental counter with 0 and create empty dictionary
+    inc = 0
+    d = dict()
+    for coloring in colorings:
+        #Create copy to avoid changing original dicts
+        copy = coloring.copy()
+        # Add incremental counter to avoid overlap and increase counter for the next coloring
+        increaseColorValues(copy, inc)
+        if delta < numberOfColors(coloring):
+            print("Incorrect upper bound passed")
+        inc = inc + delta
+        # Merge all dictionaries so far
+        d.update(copy)
+    
+    # Return combined coloring
+    return d
 
 # Function to read the reddit database from the text file
 # Access edges and vertices using misc.edges and misc.vertices
