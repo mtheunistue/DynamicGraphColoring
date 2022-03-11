@@ -20,9 +20,10 @@ def draw(G: nx.Graph, coloring: dict=None, pos: nx.layout=None):
         nx.draw(G, pos, with_labels=True)
     else:
         # Create drawable color_list from coloring in the right order
+        drawableColoring = toDrawableColoring(coloring)
         color_list = []
         for node in G.nodes:
-            color_list.append(coloring.get(node))
+            color_list.append(drawableColoring.get(node))
 
         # Draw colored graph with color_list if colors were provided
         plt.figure()
@@ -55,7 +56,10 @@ def increaseColorValues(coloring: dict, inc: int):
 
 # Combines different coloring dictionaries by incrementing color values
 # Intuitively this gives each coloring a unique set of colors to use
-def combineColorings(colorings):
+
+# DEPRECATED
+def combineColoringsAdjacent(colorings):
+    print("Using deprecated method combineColoringsAdjacent")
     # Initialize incremental counter with 0 and create empty dictionary
     inc = 0
     d = dict()
@@ -75,7 +79,10 @@ def combineColorings(colorings):
 # Intuitively this gives each coloring a unique set of colors to use
 # This variation takes delta as parameter, which is the upper bound on the colors each subcoloring should be allowed to use
 # By combining the colorings in this way, other subcolorings are not affected by changes in other subcolorings, making it more stable
+
+# DEPRECATED
 def combineColoringsStable(colorings, delta: int):
+    print("Using deprecated method combineColoringsStable")
     # Initialize incremental counter with 0 and create empty dictionary
     inc = 0
     d = dict()
@@ -92,6 +99,39 @@ def combineColoringsStable(colorings, delta: int):
     
     # Return combined coloring
     return d
+
+# Combines colorings that are already unique labeled
+def combineColoringsUnique(colorings):
+    d = dict()
+    for coloring in colorings:
+        d.update(coloring)
+    return d
+
+
+# Labels any coloring with level information
+# Used to make the color pallete of each level unique
+def useUniqueColors(coloring, level):
+    uniqueColoring = coloring.copy()
+    for key in coloring.keys():
+        uniqueColoring[key] = 'L' + str(level) + 'C' + str(coloring[key])
+    return uniqueColoring
+
+
+# Converts any coloring to a drawable coloring by transforming non-integer values to integers
+def toDrawableColoring(coloring):
+    colorDict = {}
+    i = 0
+    for key in coloring.keys():
+        if coloring[key] not in colorDict:
+            colorDict[coloring[key]] = i
+            i += 1
+    
+    drawableColoring = {}
+    for key in coloring.keys():
+        drawableColoring[key] = colorDict[coloring[key]]
+
+    return drawableColoring
+
 
 # Returns the number of recolors between two coloring dictionaries
 # Does not count adding a new node as a recolor

@@ -148,11 +148,13 @@ class SmallBucketAlgo:
 
 
     def getColoring(self):
-        bucketColorings = [self.staticColoring]
+        bucketColorings = [misc.useUniqueColors(self.staticColoring, 0)]
+        i = 1
         for bucketLevel in self.bucketLevels:
             for bucket in bucketLevel:
-                bucketColorings.append(bucket.coloring)
-        combinedColoring = misc.combineColoringsStable(bucketColorings, self.nr)   
+                bucketColorings.append(misc.useUniqueColors(bucket.coloring, i))
+                i += 1
+        combinedColoring = misc.combineColoringsUnique(bucketColorings)   
         return combinedColoring     
 
 
