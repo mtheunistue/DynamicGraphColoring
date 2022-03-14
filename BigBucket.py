@@ -147,11 +147,11 @@ class BigBucketAlgo:
 
 
     def getColoring(self):
-        bucketColorings = [misc.useUniqueColors(self.staticColoring, 0)]
+        bucketColorings = [misc.useUniquePalette(self.staticColoring, 0)]
         i = 1
         for bucketLevel in self.bucketLevels:
             for bucket in bucketLevel:
-                bucketColorings.append(misc.useUniqueColors(bucket.coloring, i))
+                bucketColorings.append(misc.useUniquePalette(bucket.coloring, i))
                 i += 1
         combinedColoring = misc.combineColoringsUnique(bucketColorings)   
         return combinedColoring     

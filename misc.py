@@ -110,7 +110,7 @@ def combineColoringsUnique(colorings):
 
 # Labels any coloring with level information
 # Used to make the color pallete of each level unique
-def useUniqueColors(coloring, level):
+def useUniquePalette(coloring, level):
     uniqueColoring = coloring.copy()
     for key in coloring.keys():
         uniqueColoring[key] = 'L' + str(level) + 'C' + str(coloring[key])
@@ -142,6 +142,21 @@ def numberOfRecolors(c1: dict, c2: dict) -> int:
             if c1[key] != c2[key]:
                 rc += 1
     return rc
+
+
+# Checks whether a coloring is indeed correct
+# by iterating over all edges and verifying no two neighbors have the same color
+def verifyColoring(G, coloring) -> bool:
+    for edge in G.edges():
+        n1 = edge[0]
+        n2 = edge[1]
+        if (not n1 in coloring) or (not n2 in coloring):
+            print("Graph includes nodes not present in the coloring")
+            return False
+        if coloring.get(n1) == coloring.get(n2):
+            return False
+    return True
+    
 
 # Function to read the reddit database from the text file
 # Access edges and vertices using misc.edges and misc.vertices
