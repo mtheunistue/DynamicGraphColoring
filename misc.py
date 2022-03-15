@@ -158,6 +158,15 @@ def verifyColoring(G, coloring) -> bool:
     return True
     
 
+# Prints some graph information
+def graphInfo(G):
+    print("Nodes: " + str(G.number_of_nodes()))
+    print("Edges: " + str(G.number_of_edges()))
+    print("Density: " + str(nx.density(G)))
+    print("Max Degree: " + str(getMaxDegree(G)))
+    print("Static Coloring uses " + str(numberOfColors(nx.coloring.greedy_color(G))) + " colors")
+
+
 # Function to read the reddit database from the text file
 # Access edges and vertices using misc.edges and misc.vertices
 def readRedditData():
