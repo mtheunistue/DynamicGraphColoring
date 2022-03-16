@@ -1,6 +1,8 @@
 import networkx as nx
 import matplotlib
 import matplotlib.pyplot as plt
+import random
+import math
 
 
 def head(a: dict, i: int) -> dict:
@@ -47,6 +49,14 @@ def getMaxDegree(G):
         maxDeg = max(maxDeg, tuple[1])
     return maxDeg
 
+# Find average degree of G
+def getAverageDegree(G):
+    totalDegree = 0
+    degreeTuples = list(G.degree(list(G.nodes())))
+    for tuple in degreeTuples:
+        totalDegree += tuple[1]
+    return totalDegree/len(degreeTuples)
+    
 # Subroutine for combineColorings that increases all values in a dictionary by an integer
 # Note: modifies the original dictionary passed as parameter!
 def increaseColorValues(coloring: dict, inc: int):
@@ -164,6 +174,7 @@ def graphInfo(G):
     print("Edges: " + str(G.number_of_edges()))
     print("Density: " + str(nx.density(G)))
     print("Max Degree: " + str(getMaxDegree(G)))
+    print("Average Degree: " + str(getAverageDegree(G)))
     print("Static Coloring uses " + str(numberOfColors(nx.coloring.greedy_color(G))) + " colors")
 
 
@@ -183,3 +194,98 @@ def readRedditData():
         vertices.append(line.strip())
     file.close()
 
+
+# Creates a random graph with parameters to adjust size, density, max degree and the variation present in these values
+def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeVariation=None, densityVariation=None, maxDegreeVariation=None):
+
+    G = nx.Graph() 
+
+    # Variation parameters decide how much randomness is used in the generation of the graph
+    # There is a general variation parameter and three specific ones: if the specific variation is None, it is assigned the general variation
+    # Variation must be between 0 and 1, where 0 means no variation and 1 means the values may vary as much as the value itself (thus, range from 0 to 2*value)
+    if sizeVariation == None:
+        sizeVariation = variation
+    if densityVariation == None:
+        densityVariation = variation
+    if maxDegreeVariation == None:
+        maxDegreeVariation = variation
+    
+    # Do some input tests to see if parameters are correct
+    if size < 0 or density < 0 or density > 1 or \
+        variation < 0 or variation > 1 or \
+        sizeVariation < 0 or sizeVariation > 1 or \
+        densityVariation < 0 or densityVariation > 1 or \
+        maxDegreeVariation < 0 or maxDegreeVariation > 1:
+            print("Incorrect parameter passed, returning empty graph")
+            return G
+
+    # Finalize values for graph creation by using randomness
+    fSizeVariation = random.uniform(-sizeVariation, sizeVariation)
+    fSize = int(max(2, size + (fSizeVariation*size)))
+    
+    densityRange = (max(0, density-densityVariation*density), min(1, density+densityVariation*density))
+    fDensity = random.uniform(densityRange[0], densityRange[1])
+    fEdges = int(fDensity * fSize*(fSize-1) / 2)
+    fDensity = 2*fEdges / (fSize*(fSize-1))
+
+    fMaxDegree = None
+    if maxDegree != None:
+        # Potentially inaccurate lower/upper bounds
+        maxDegreeRange = (max(math.ceil(fDensity*(fSize-1)), min(min(fSize-1, fEdges), maxDegree-maxDegreeVariation*maxDegree))), min(min(fSize-1, fEdges), max(math.ceil(fDensity*(fSize-1)), maxDegree+maxDegreeVariation*maxDegree))
+        if maxDegree < maxDegreeRange[0] or maxDegree > maxDegreeRange[1]:
+            print("Chosen max degree does not fall into range (" + str(math.ceil(fDensity*(fSize-1))) + ", " + str(min(fSize-1, fEdges)) + ") permitted by other parameters, so picking closest value instead")
+        fMaxDegree = int(random.uniform(maxDegreeRange[0], maxDegreeRange[1]))
+
+    # Start creation of the graph using finalized parameters
+    # Create the graphs vertices
+    for i in range(0, fSize):
+        G.add_node(i)
+
+    allEdges = []
+    for i in range(0, fSize):
+        for j in range(0, fSize):
+            if i > j:
+                allEdges.append((i,j))
+
+    # Create the graphs edges
+    edgeSet = []
+
+    # If we require a certain max degree first ensure one node fulfills this requirement
+    if fMaxDegree != None:
+
+        # Create an array which keeps track of the current degree of each node
+        degreeCounter = []
+        for i in range(0, fSize):
+            degreeCounter.append(0)
+        
+        # Pick one node to give max degree
+        node = random.randint(0, fSize-1)
+
+        # Get all potential edges for this node and select the correct amount of them
+        maxNodeEdges = []
+        for edge in allEdges:
+            if node in edge:
+                maxNodeEdges.append(edge)
+        edgeSet = random.sample(maxNodeEdges, fMaxDegree)
+        degreeCounter[node] = fMaxDegree    # Update the selected node counter
+        for edge in maxNodeEdges:           # Remove all edges connected to the selected node from the available edge set
+            allEdges.remove(edge)
+
+        # For the remaining edges, select at random while keeping track of counters
+        remainingEdges = fEdges - fMaxDegree
+        while remainingEdges > 0:
+            edge = random.sample(allEdges, 1)[0]
+            if degreeCounter[edge[0]] < fMaxDegree and degreeCounter[edge[1]] < fMaxDegree:
+                edgeSet.append(edge)
+                degreeCounter[edge[0]] += 1
+                degreeCounter[edge[1]] += 1
+                remainingEdges -= 1
+            allEdges.remove(edge)
+
+    # If the max degree is not specified simply select the correct amount of random edges
+    else:
+        edgeSet = random.sample(allEdges, fEdges)
+
+    G.add_edges_from(edgeSet)
+
+    return G
