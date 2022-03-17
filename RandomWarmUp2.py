@@ -7,20 +7,17 @@ import random
 
 class WarmUp2Algo:
     def __init__(self, G: nx.Graph = nx.Graph()):
-
-        self.G = nx.Graph()        
-
+        self.G = G                                  # Initial graph
         self.changeCounter = 0                      # Initialize changeCounter to 0
+        
         nx.set_node_attributes(G, 0, 'color')       # Reset all colors to 0
         nx.set_node_attributes(G, 0, 'changed')     # Reset all change integers to 0
 
-        # Initialize graph by adding nodes and edges one by one
+        # Initialize graph nodes by setting their colors correctly
+        initColoring = nx.coloring.greedy_color(G)
         for node in G.nodes():
-            self.addVertex(node)
-        for edge in G.edges():
-            self.addEdge(edge[0], edge[1])
+            G.nodes[node]['color'] = initColoring[node]
     
-
 
     # Randomly recolors a node with a color none of its neighbors have
     def recolor(self, node):

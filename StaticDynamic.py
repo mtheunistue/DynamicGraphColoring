@@ -104,7 +104,7 @@ class StaticDynamicAlgo:
         self.G.remove_edge(s, t)
         if self.DBB.G.has_edge(s, t):
             self.DBB.removeEdge(s, t)
-        self.updateStep()
+        #self.updateStep()                 # Does not count as an update
 
     def removeVertex(self, v):
 
@@ -113,7 +113,7 @@ class StaticDynamicAlgo:
             return
         self.G.remove_node(v)
         self.DBB.removeVertex(v)
-        self.updateStep()
+        #self.updateStep()                 # Does not count as an update
 
     def addEdge(self, s, t):
 
@@ -157,4 +157,4 @@ class StaticDynamicAlgo:
         self.staticColoring[v] = 'L0C0'
         self.G.nodes[v]['recentDegree'] = 0
         self.DBB.addVertex(v)
-        self.updateStep()
+        #self.updateStep()                 # Does not count as an update
