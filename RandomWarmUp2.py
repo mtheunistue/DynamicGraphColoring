@@ -5,8 +5,9 @@ import math
 import random
 
 
-class WarmUp1Algo:
+class WarmUp2Algo:
     def __init__(self, G: nx.Graph = nx.Graph()):
+
         self.G = nx.Graph()        
 
         self.changeCounter = 0                      # Initialize changeCounter to 0
@@ -18,27 +19,45 @@ class WarmUp1Algo:
             self.addVertex(node)
         for edge in G.edges():
             self.addEdge(edge[0], edge[1])
-            
+    
 
-    # Randomly recolors a node with a color none of its neighbours have
+
+    # Randomly recolors a node with a color none of its neighbors have
     def recolor(self, node):
         self.changeCounter += 1      # update change counter
         self.G.nodes[node]['changed'] = self.changeCounter
 
-        # Create set of all colors occupied by neighbours
+        # Create set of all colors occupied by at least two neighbors and a set of all colors occupied by neighbors
         neighbors = list(self.G.neighbors(node))
         occupiedColors: set = set({})
+        doubleOccupiedColors: set = set({})
         for neighbor in neighbors:
-            occupiedColors.add(self.G.nodes[neighbor]['color'])
+            color = self.G.nodes[neighbor]['color']
+            if color in occupiedColors:
+                doubleOccupiedColors.add(color)
+            occupiedColors.add(color)
 
-        # Create set of all available colors to this node
-        colors: set = set({})
+        uniqueColors = occupiedColors.difference(doubleOccupiedColors)  # Get the colors that are occupied by only a single neighbor
+
+        # Create set of all available blank colors to this node
+        blankColors: set = set({})
         for i in range(0, self.G.degree[node]+1):
             if i not in occupiedColors:
-                colors.add(i)
-        
+                blankColors.add(i)
+
+        colors = blankColors.union(uniqueColors)    # Get all available colors
+
         # Select random color from available colors
-        self.G.nodes[node]['color'] = random.choice(tuple(colors))
+        pickedColor = random.choice(tuple(colors))
+        self.G.nodes[node]['color'] = pickedColor
+
+        # If a color occupied by a neighbor was picked, recursively recolor this neighbor
+        if pickedColor in uniqueColors:
+            for neighbor in neighbors:
+                if self.G.nodes[neighbor]['color'] == pickedColor:
+                    self.recolor(neighbor)
+                    break
+
 
 
     # Methods for possible updates
