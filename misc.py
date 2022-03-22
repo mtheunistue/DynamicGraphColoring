@@ -178,6 +178,73 @@ def graphInfo(G):
     print("Static Coloring uses " + str(numberOfColors(nx.coloring.greedy_color(G))) + " colors")
 
 
+# Extracts updates from a (generated) graph G
+# Sorted, random and skewed orderings are available
+def extractUpdates(G, ordering=None):
+    if ordering == None:
+        ordering = 'random'
+    selection = ['random', 'skewed', 'sorted']
+    if ordering not in selection:
+        raise ValueError("Invalid ordering choice. Expected one of: %s" % selection)
+
+    # Get potential edges
+    edges = list(G.edges())
+
+    # Initialize empty update list
+    updates = []
+
+    # Depending on the selection made, fill update list in different order
+    if ordering == 'sorted':
+        updates = edges
+    elif ordering == 'random':
+        for i in range(0, len(edges)):
+            edge = random.sample(edges, 1)[0]
+            edges.remove(edge)
+            updates.append(edge)
+    else:
+        # Make edges adjacent to nodes already in the graph have a higher probability of being chosen
+        # Initialize weights fairly
+        weights = []
+        for i in range(0, len(edges)):
+            weights.append(1)
+
+        # Add edges one by one
+        for i in range(0, len(edges)):
+            edge = random.choices(edges, weights=weights, k=1)[0]
+            index = edges.index(edge)
+            edges.remove(edge)
+            weights.pop(index)
+            updates.append(edge)
+
+            # Update weights
+            for i in range(0, len(weights)):
+                if edge[0] in edges[i]:
+                    weights[i] += 1
+                if edge[1] in edges[i]:
+                    weights[i] += 1       
+
+    return updates
+
+
+# Iterates over a list of updates, for easier testing
+# Can be extended to work with updates other than edge insertions as well
+class UpdateIterator:
+    def __init__(self, algo, updates):
+        self.algo = algo
+        self.updateIterator = iter(updates)
+    
+    # Uses the given algorithm to run the next i updates
+    def runUpdate(self, i):
+        for x in range(0, i):
+            update = next(self.updateIterator, None)
+            if update == None:
+                print("No more updates in given update sequence")
+                return False
+            else:
+                self.algo.addEdge(update[0], update[1])
+        return True
+
+
 # Function to read the reddit database from the text file
 # Access edges and vertices using misc.edges and misc.vertices
 def readRedditData():
