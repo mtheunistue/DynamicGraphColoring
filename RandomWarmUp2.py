@@ -6,17 +6,18 @@ import random
 
 
 class WarmUp2Algo:
-    def __init__(self, G: nx.Graph = nx.Graph()):
-        self.G = G                                  # Initial graph
+    def __init__(self, G: nx.Graph = nx.Graph(), maxDegreeBound: int = None):
+        self.G = G.copy()                           # Initial graph
         self.changeCounter = 0                      # Initialize changeCounter to 0
+        self.maxDegreeBound = maxDegreeBound        # Optional maximum degree bound for defining the set of available colors
         
-        nx.set_node_attributes(G, 0, 'color')       # Reset all colors to 0
-        nx.set_node_attributes(G, 0, 'changed')     # Reset all change integers to 0
+        nx.set_node_attributes(self.G, 0, 'color')       # Reset all colors to 0
+        nx.set_node_attributes(self.G, 0, 'changed')     # Reset all change integers to 0
 
         # Initialize graph nodes by setting their colors correctly
         initColoring = nx.coloring.greedy_color(G)
-        for node in G.nodes():
-            G.nodes[node]['color'] = initColoring[node]
+        for node in self.G.nodes():
+            self.G.nodes[node]['color'] = initColoring[node]
     
 
     # Randomly recolors a node with a color none of its neighbors have
@@ -38,9 +39,14 @@ class WarmUp2Algo:
 
         # Create set of all available blank colors to this node
         blankColors: set = set({})
-        for i in range(0, self.G.degree[node]+1):
-            if i not in occupiedColors:
-                blankColors.add(i)
+        if self.maxDegreeBound == None:
+            for i in range(0, self.G.degree[node]+1):
+                if i not in occupiedColors:
+                    blankColors.add(i)
+        else:
+            for i in range(0, self.maxDegreeBound+1):
+                if i not in occupiedColors:
+                    blankColors.add(i)
 
         colors = blankColors.union(uniqueColors)    # Get all available colors
 

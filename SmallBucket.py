@@ -27,9 +27,9 @@ class Bucket:
 
 class SmallBucketAlgo:
     def __init__(self, d, G: nx.Graph = nx.Graph()):
-        self.G = G
+        self.G = G.copy()
         self.d = d                          # Amount of levels
-        self.nr = G.number_of_nodes         # Initialize nr to 0
+        self.nr = self.G.number_of_nodes    # Initialize nr to 0
         self.staticColoring = {}            # Coloring at any moment
         self.bucketLevels = []
         self.resetBuckets(self.G)

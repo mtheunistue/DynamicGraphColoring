@@ -7,8 +7,8 @@ import RandomWarmUp1
 
 class StaticDynamicAlgo:
     def __init__(self, G: nx.Graph = nx.Graph()):
-        self.l = 5       # Number of updates per segment, segment length
-        self.G = G       # Graph to be used
+        self.l = 5          # Number of updates per segment, segment length
+        self.G = G.copy()   # Graph to be used
         self.staticColoring = {}
 
         self.activeLevel = 0
@@ -16,7 +16,7 @@ class StaticDynamicAlgo:
         nx.set_node_attributes(self.G, 0, 'recentDegree')       # Reset all recent degrees to 0
 
         Gp = nx.Graph()                     # Sparse version of graph G
-        Gp.add_nodes_from(G.nodes())        # Initialize with only nodes and no edges
+        Gp.add_nodes_from(self.G.nodes())   # Initialize with only nodes and no edges
 
         self.DBB = RandomWarmUp1.WarmUp1Algo(Gp)     # Dynamic black-box algorithm to be used
 
