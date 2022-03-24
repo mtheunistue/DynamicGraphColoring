@@ -40,6 +40,8 @@ class DcOrientAlgo:
 
     def collectColor(self, u):
         I = self.Gstar.nodes[u]['DINC']
+        print("cu is " + str(I.cu))
+        print("cnt is " + str(I.cnt))
         if len(I.cu) > 0:
             return min(I.cu)
         if I.cnt.get(self.Gstar.nodes[u]['color'], 0) != 0:
@@ -52,22 +54,25 @@ class DcOrientAlgo:
     def assignColor(self, u, Cnew):
         for edge in self.Gstar.out_edges(u):
             v = edge[1]
+            print("letting " + str(v) + " know about color update")
             self.dincColorDecrease(v, u)
-            self.dincColorIncrease(v, Cnew)
+            self.dincColorIncrease(v, c=Cnew)
+            print("Node " + str(v) + " now has cnt " + str(self.Gstar.nodes[v]['DINC'].cnt))
         self.Gstar.nodes[u]['color'] = Cnew
-        self.Gstar.nodes[u]['DINC'].cu = set({})
+        self.Gstar.nodes[u]['DINC'].cu.clear()
 
 
     def notifyColor(self, u, Cold: int, q: PriorityQueue):
         for edge in self.Gstar.out_edges(u):
             v = edge[1]
-            if not self.nodePriority(v) in q.queue and (self.Gstar.nodes[u]['color'] == self.Gstar.nodes[v]['color'] or Cold < self.Gstar.nodes[v]['color']):
+            if (not (self.nodePriority(v), v) in q.queue) and (self.Gstar.nodes[u]['color'] == self.Gstar.nodes[v]['color'] or Cold < self.Gstar.nodes[v]['color']):
                 q.put((self.nodePriority(v), v))
 
 
     def CAN(self, q: PriorityQueue):
         while not q.empty():
             u = q.get()[1]
+            print('executing CAN step for node ' + str(u))
             Cnew = self.collectColor(u)
             if Cnew != None:
                 Cold = self.Gstar.nodes[u]['color']
@@ -75,9 +80,13 @@ class DcOrientAlgo:
                 self.notifyColor(u, Cold, q)
 
 
-    def dincColorIncrease(self, u, v):
+    def dincColorIncrease(self, u, v=None, c=None):
         I = self.Gstar.nodes[u]['DINC']
-        c = self.Gstar.nodes[v]['color']
+        if v != None:
+            c = self.Gstar.nodes[v]['color']
+        elif c == None:
+            print("Parameters not properly passed for dincColorIncrease")
+            return
         if c <= self.Gstar.in_degree(u):
             if I.cnt.get(c, 0) != 0:
                 I.cnt[c] += 1
@@ -90,14 +99,17 @@ class DcOrientAlgo:
     def dincColorDecrease(self, u, v):
         I = self.Gstar.nodes[u]['DINC']
         c = self.Gstar.nodes[v]['color']
-        if c <= self.Gstar.in_degree(u):
-            if I.cnt.get(c, 1) != 1:
-                I.cnt[c] += -1
-            else:
-                if c in I.cnt:
-                    I.cnt.pop(c)
+        print("I.cnt is " + str(I.cnt))
+        if I.cnt.get(c, 0) > 0:
+            print("decreasing color " + str(c))
+            I.cnt[c] = I.cnt[c]-1
+        if I.cnt.get(c, 0) == 0:
+            if c in I.cnt:
+                I.cnt.pop(c)
         if I.cnt.get(c, 0) == 0 and c < self.Gstar.nodes[u]['color']:
             I.cu.add(c)
+        print("I.cnt is " + str(I.cnt))
+        print("I.cu is " + str(I.cu))
 
 
     def ocgInsert(self, u, v):
@@ -106,6 +118,10 @@ class DcOrientAlgo:
         S.add(v)
 
         self.Gstar.add_edge(u, v)
+        if self.isBefore(v, u):
+            x = u
+            u = v
+            v = x
 
         for edge in list(self.Gstar.in_edges(u)).copy():
             nbr = edge[0]
