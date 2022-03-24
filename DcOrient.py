@@ -99,13 +99,14 @@ class DcOrientAlgo:
     def dincColorDecrease(self, u, v):
         I = self.Gstar.nodes[u]['DINC']
         c = self.Gstar.nodes[v]['color']
-        print("I.cnt is " + str(I.cnt))
-        if I.cnt.get(c, 0) > 0:
-            print("decreasing color " + str(c))
-            I.cnt[c] = I.cnt[c]-1
-        if I.cnt.get(c, 0) == 0:
-            if c in I.cnt:
-                I.cnt.pop(c)
+        if c <= self.Gstar.in_degree(u):
+            print("I.cnt is " + str(I.cnt))
+            if I.cnt.get(c, 0) > 0:
+                print("decreasing color " + str(c))
+                I.cnt[c] = I.cnt[c]-1
+            if I.cnt.get(c, 0) == 0:
+                if c in I.cnt:
+                    I.cnt.pop(c)
         if I.cnt.get(c, 0) == 0 and c < self.Gstar.nodes[u]['color']:
             I.cu.add(c)
         print("I.cnt is " + str(I.cnt))
@@ -117,13 +118,12 @@ class DcOrientAlgo:
         S.add(u)
         S.add(v)
 
-        self.Gstar.add_edge(u, v)
-        if self.isBefore(v, u):
-            x = u
-            u = v
-            v = x
+        uEdges = list(self.Gstar.in_edges(u)).copy()
+        vEdges = list(self.Gstar.in_edges(v)).copy()
 
-        for edge in list(self.Gstar.in_edges(u)).copy():
+        self.Gstar.add_edge(u, v)
+
+        for edge in uEdges:
             nbr = edge[0]
             if self.isBefore(u, nbr):
                 self.Gstar.remove_edge(nbr, u)
@@ -132,7 +132,7 @@ class DcOrientAlgo:
                 self.dincColorDecrease(u, nbr)
                 S.add(nbr)
         
-        for edge in list(self.Gstar.in_edges(v)).copy():
+        for edge in vEdges:
             nbr = edge[0]
             if self.isBefore(v, nbr):
                 self.Gstar.remove_edge(nbr, v)
@@ -143,7 +143,7 @@ class DcOrientAlgo:
         self.dincColorIncrease(v, u)
         for edge in self.Gstar.in_edges(v):
             nbr = edge[0]
-            if self.Gstar.nodes[nbr]['color'] == self.Gstar.in_degree(v):
+            if nbr != u and self.Gstar.nodes[nbr]['color'] == self.Gstar.in_degree(v):
                 self.dincColorIncrease(v, nbr)
         return S
 
@@ -185,7 +185,10 @@ class DcOrientAlgo:
 
     def dcOrientInsert(self, u, v):
         q = PriorityQueue()
-        S = self.ocgInsert(u, v)
+        if self.isBefore(u, v):
+            S = self.ocgInsert(u, v)
+        else:
+            S = self.ocgInsert(v, u)
         for w in S:
             q.put((self.nodePriority(w), w))
         self.CAN(q)

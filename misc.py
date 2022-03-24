@@ -219,9 +219,9 @@ def extractUpdates(G, ordering=None):
             # Update weights
             for i in range(0, len(weights)):
                 if edge[0] in edges[i]:
-                    weights[i] += 1
+                    weights[i] += 2000
                 if edge[1] in edges[i]:
-                    weights[i] += 1       
+                    weights[i] += 2000     
 
     return updates
 
