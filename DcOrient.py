@@ -87,11 +87,11 @@ class DcOrientAlgo:
         elif c == None:
             print("Parameters not properly passed for dincColorIncrease")
             return
-        if c <= self.Gstar.in_degree(u):
-            if I.cnt.get(c, 0) != 0:
-                I.cnt[c] += 1
-            else:
-                I.cnt[c] = 1
+        # if c <= self.Gstar.in_degree(u):          # REMOVED TO FIX BUG
+        if I.cnt.get(c, 0) != 0:
+            I.cnt[c] += 1
+        else:
+            I.cnt[c] = 1
         if c in I.cu:
             I.cu.remove(c)
 
@@ -99,14 +99,16 @@ class DcOrientAlgo:
     def dincColorDecrease(self, u, v):
         I = self.Gstar.nodes[u]['DINC']
         c = self.Gstar.nodes[v]['color']
-        if c <= self.Gstar.in_degree(u):
-            print("I.cnt is " + str(I.cnt))
-            if I.cnt.get(c, 0) > 0:
-                print("decreasing color " + str(c))
-                I.cnt[c] = I.cnt[c]-1
-            if I.cnt.get(c, 0) == 0:
-                if c in I.cnt:
-                    I.cnt.pop(c)
+       
+        # if c <= self.Gstar.in_degree(u):          # REMOVED TO FIX BUG
+        print("I.cnt is " + str(I.cnt))
+        if I.cnt.get(c, 0) > 0:
+            print("decreasing color " + str(c))
+            I.cnt[c] = I.cnt[c]-1
+        if I.cnt.get(c, 0) == 0:
+            if c in I.cnt:
+                I.cnt.pop(c)
+       
         if I.cnt.get(c, 0) == 0 and c < self.Gstar.nodes[u]['color']:
             I.cu.add(c)
         print("I.cnt is " + str(I.cnt))
@@ -141,10 +143,10 @@ class DcOrientAlgo:
                 self.dincColorDecrease(v, nbr)
                 S.add(nbr)
         self.dincColorIncrease(v, u)
-        for edge in self.Gstar.in_edges(v):
-            nbr = edge[0]
-            if nbr != u and self.Gstar.nodes[nbr]['color'] == self.Gstar.in_degree(v):
-                self.dincColorIncrease(v, nbr)
+        # for edge in self.Gstar.in_edges(v):                                               # REMOVED TO FIX BUG
+        #     nbr = edge[0]
+        #     if nbr != u and self.Gstar.nodes[nbr]['color'] == self.Gstar.in_degree(v):
+        #         self.dincColorIncrease(v, nbr)
         return S
 
 
@@ -178,8 +180,8 @@ class DcOrientAlgo:
                 self.dincColorDecrease(nbr, v)
                 S.add(nbr)
         self.dincColorDecrease(v, u)
-        if self.Gstar.in_degree(v) + 1 in self.Gstar.nodes[v]['DINC'].cnt:
-            self.Gstar.nodes[v]['DINC'].cnt.pop(self.Gstar.in_degree(v) + 1)
+        # if self.Gstar.in_degree(v) + 1 in self.Gstar.nodes[v]['DINC'].cnt:                        # REMOVED TO FIX BUG
+        #     self.Gstar.nodes[v]['DINC'].cnt.pop(self.Gstar.in_degree(v) + 1)
         return S
 
 
