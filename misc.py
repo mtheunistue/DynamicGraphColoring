@@ -257,7 +257,6 @@ class UpdateIterator:
     def __init__(self, algo, updates):
         self.algo = algo
         self.updateIterator = iter(updates)
-        self.G = algo.G                     # For easier access while testing
     
     # Uses the given algorithm to run the next i updates
     def runUpdate(self, i):
@@ -269,10 +268,6 @@ class UpdateIterator:
             else:
                 self.algo.addEdge(update[0], update[1])
         return True
-
-    # Adapter method for easier use
-    def getColoring(self):
-        return self.algo.getColoring()
 
 
 # Function to read the reddit database from the text file
