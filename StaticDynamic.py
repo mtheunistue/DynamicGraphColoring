@@ -1,4 +1,5 @@
 #Imports
+from types import DynamicClassAttribute
 import networkx as nx
 import misc
 import math
@@ -6,10 +7,11 @@ import random
 import RandomWarmUp1
 
 class StaticDynamicAlgo:
-    def __init__(self, G: nx.Graph = nx.Graph()):
-        self.l = 5          # Number of updates per segment, segment length
+    def __init__(self, G: nx.Graph = nx.Graph(), l=5, dynamicReset: bool=False):
+        self.l = l          # Number of updates per segment, segment length
         self.G = G.copy()   # Graph to be used
         self.staticColoring = {}
+        self.dynamicReset = dynamicReset        # Opt in or out of variation with reset of the dynamic coloring
 
         self.activeLevel = 0
 
@@ -44,6 +46,7 @@ class StaticDynamicAlgo:
 
     # Resets all variables, only called during initialization and when the end of the segment at level 0 is reached
     def fullReset(self):
+        print("full reset")
         self.c = 0
 
         self.maxLevel = int(math.log(self.G.number_of_nodes(), 2))  # Calculate number of levels required, assumes number of vertices is static
@@ -54,6 +57,11 @@ class StaticDynamicAlgo:
             self.levels.append((rLevel, True))               # Initialize all levels as active
 
         self.staticBlackBox(self.G, 0)                            # Color full graph using static black box with level 0 color palette
+
+        if self.dynamicReset:
+            Gp = nx.Graph()                              # Re-initialize the dynamic black box
+            Gp.add_nodes_from(self.G.nodes())
+            self.DBB = RandomWarmUp1.WarmUp1Algo(Gp)
 
     
     # General update step called in every update

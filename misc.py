@@ -183,11 +183,12 @@ def graphInfo(G):
 def extractUpdates(G, ordering=None):
     if ordering == None:
         ordering = 'random'
-    selection = ['random', 'skewed', 'sorted']
+    selection = ['random', 'expanding', 'prioritized', 'sorted']
     if ordering not in selection:
         raise ValueError("Invalid ordering choice. Expected one of: %s" % selection)
 
-    # Get potential edges
+    # Get potential edges and nodes
+    nodes = list(G.nodes())
     edges = list(G.edges())
 
     # Initialize empty update list
@@ -201,7 +202,7 @@ def extractUpdates(G, ordering=None):
             edge = random.sample(edges, 1)[0]
             edges.remove(edge)
             updates.append(edge)
-    else:
+    elif ordering == 'expanding':
         # Make edges adjacent to nodes already in the graph have a higher probability of being chosen
         # Initialize weights fairly
         weights = []
@@ -219,9 +220,33 @@ def extractUpdates(G, ordering=None):
             # Update weights
             for i in range(0, len(weights)):
                 if edge[0] in edges[i]:
-                    weights[i] += 2000
+                    weights[i] += 2000                             # Scaling is possible here, but has little effect
                 if edge[1] in edges[i]:
-                    weights[i] += 2000     
+                    weights[i] += 2000
+    elif ordering == 'prioritized':
+        # Get priority for nodes   
+        priorities = []
+        for i in range(0, len(nodes)):
+            priorities.append(int(random.uniform(1, 100)))          # Perhaps scaling is possible here
+
+        while len(edges) > 0:
+            # Pick a random node
+            node = random.choices(nodes, weights=priorities, k=1)[0]
+            # Get all edges for that node
+            nodeEdges = []
+            for edge in edges:
+                if node in edge:
+                    nodeEdges.append(edge)
+            if len(nodeEdges) == 0:
+                # This node has no edges left, remove it from the selection set
+                priorities.pop(nodes.index(node))
+                nodes.remove(node)
+            else:
+                # Select random edge from nodeEdges
+                edge = random.sample(nodeEdges, 1)[0]
+                # Add edge to updates and remove edge from remaining edges
+                updates.append(edge)
+                edges.remove(edge)
 
     return updates
 
@@ -232,6 +257,7 @@ class UpdateIterator:
     def __init__(self, algo, updates):
         self.algo = algo
         self.updateIterator = iter(updates)
+        self.G = algo.G                     # For easier access while testing
     
     # Uses the given algorithm to run the next i updates
     def runUpdate(self, i):
@@ -243,6 +269,10 @@ class UpdateIterator:
             else:
                 self.algo.addEdge(update[0], update[1])
         return True
+
+    # Adapter method for easier use
+    def getColoring(self):
+        return self.algo.getColoring()
 
 
 # Function to read the reddit database from the text file
