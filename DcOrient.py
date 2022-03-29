@@ -40,8 +40,6 @@ class DcOrientAlgo:
 
     def collectColor(self, u):
         I = self.Gstar.nodes[u]['DINC']
-        print("cu is " + str(I.cu))
-        print("cnt is " + str(I.cnt))
         if len(I.cu) > 0:
             return min(I.cu)
         if I.cnt.get(self.Gstar.nodes[u]['color'], 0) != 0:
@@ -54,10 +52,8 @@ class DcOrientAlgo:
     def assignColor(self, u, Cnew):
         for edge in self.Gstar.out_edges(u):
             v = edge[1]
-            print("letting " + str(v) + " know about color update")
             self.dincColorDecrease(v, u)
             self.dincColorIncrease(v, c=Cnew)
-            print("Node " + str(v) + " now has cnt " + str(self.Gstar.nodes[v]['DINC'].cnt))
         self.Gstar.nodes[u]['color'] = Cnew
         self.Gstar.nodes[u]['DINC'].cu.clear()
 
@@ -72,7 +68,6 @@ class DcOrientAlgo:
     def CAN(self, q: PriorityQueue):
         while not q.empty():
             u = q.get()[1]
-            print('executing CAN step for node ' + str(u))
             Cnew = self.collectColor(u)
             if Cnew != None:
                 Cold = self.Gstar.nodes[u]['color']
@@ -85,7 +80,6 @@ class DcOrientAlgo:
         if v != None:
             c = self.Gstar.nodes[v]['color']
         elif c == None:
-            print("Parameters not properly passed for dincColorIncrease")
             return
         # if c <= self.Gstar.in_degree(u):          # REMOVED TO FIX BUG
         if I.cnt.get(c, 0) != 0:
@@ -101,9 +95,7 @@ class DcOrientAlgo:
         c = self.Gstar.nodes[v]['color']
        
         # if c <= self.Gstar.in_degree(u):          # REMOVED TO FIX BUG
-        print("I.cnt is " + str(I.cnt))
         if I.cnt.get(c, 0) > 0:
-            print("decreasing color " + str(c))
             I.cnt[c] = I.cnt[c]-1
         if I.cnt.get(c, 0) == 0:
             if c in I.cnt:
@@ -111,8 +103,6 @@ class DcOrientAlgo:
        
         if I.cnt.get(c, 0) == 0 and c < self.Gstar.nodes[u]['color']:
             I.cu.add(c)
-        print("I.cnt is " + str(I.cnt))
-        print("I.cu is " + str(I.cu))
 
 
     def ocgInsert(self, u, v):
@@ -214,7 +204,6 @@ class DcOrientAlgo:
 
     def removeEdge(self, s, t):
         if not self.G.has_edge(s, t):    # Potentially redundant
-            print("Edge not present in graph")
             return
         self.G.remove_edge(s, t)
         self.dcOrientDelete(s, t)
@@ -222,7 +211,6 @@ class DcOrientAlgo:
     def removeVertex(self, v):
 
         if not self.G.has_node(v):   # Potentially redundant
-            print("Node not present in graph")
             return
         self.G.remove_node(v)
         self.Gstar.remove_node(v)
@@ -230,17 +218,15 @@ class DcOrientAlgo:
     def addEdge(self, s, t):
 
         if self.G.has_edge(s, t):    # Potentially redundant, but could be extended to also check if the vertices are present yet
-            print("Edge already in the graph")
             return
         if (not self.G.has_node(s) or not self.G.has_node(t)):
-            print("Not all nodes present in graph yet")
+
             return
         self.G.add_edge(s, t)
         self.dcOrientInsert(s,t)
 
     def addVertex(self, v):
         if self.G.has_node(v):   # Potentially redundant, depending on the input used during the experiments
-            print("Node already present in graph")
             return
         self.G.add_node(v)
         self.Gstar.add_node(v)

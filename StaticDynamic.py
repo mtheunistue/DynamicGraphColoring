@@ -46,7 +46,7 @@ class StaticDynamicAlgo:
 
     # Resets all variables, only called during initialization and when the end of the segment at level 0 is reached
     def fullReset(self):
-        print("full reset")
+        #print("full reset")
         self.c = 0
 
         self.maxLevel = int(math.log(self.G.number_of_nodes(), 2))  # Calculate number of levels required, assumes number of vertices is static
@@ -79,7 +79,6 @@ class StaticDynamicAlgo:
             if self.activeLevel == 0:
                 self.fullReset()                                                                             # Run static black box on everything and reset
             else:
-                print("running blackbox on nodes " + str(self.levels[self.activeLevel][0]))
                 self.staticBlackBox(self.G.subgraph(self.levels[self.activeLevel][0]), self.activeLevel)     # Run static black box on selected subgraph
                 self.levels[self.activeLevel] = (self.levels[self.activeLevel][0], False)                    # Deactivate this level
                 for i in range(self.activeLevel + 1, self.maxLevel + 1):                                     # Reactivate all levels higher than current level

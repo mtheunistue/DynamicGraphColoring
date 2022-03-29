@@ -263,7 +263,7 @@ class UpdateIterator:
         for x in range(0, i):
             update = next(self.updateIterator, None)
             if update == None:
-                print("No more updates in given update sequence")
+                #print("No more updates in given update sequence")
                 return False
             else:
                 self.algo.addEdge(update[0], update[1])
