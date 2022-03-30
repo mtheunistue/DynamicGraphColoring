@@ -183,7 +183,7 @@ def graphInfo(G):
 def extractUpdates(G, ordering=None):
     if ordering == None:
         ordering = 'random'
-    selection = ['random', 'expanding', 'prioritized', 'sorted']
+    selection = ['random', 'expanding', 'prioritized', 'shuffled', 'sorted']
     if ordering not in selection:
         raise ValueError("Invalid ordering choice. Expected one of: %s" % selection)
 
@@ -247,6 +247,28 @@ def extractUpdates(G, ordering=None):
                 # Add edge to updates and remove edge from remaining edges
                 updates.append(edge)
                 edges.remove(edge)
+    elif ordering == 'shuffled':
+        p = 0.6
+        freeIndices = []
+
+        for i in range(0, len(edges)):
+            updates.append(None)
+            freeIndices.append(i)
+
+        copiedEdges = edges.copy()
+        for edge in copiedEdges:
+            if random.uniform(0, 1) > p:
+                # Keep position same
+                index = copiedEdges.index(edge)
+                updates[index] = edge
+                edges.remove(edge)
+                freeIndices.remove(index)
+        
+        for edge in edges:
+            # Give remaining edges a position in the update sequence at random
+            index = random.sample(freeIndices, 1)[0]
+            updates[index] = edge
+            freeIndices.remove(index)
 
     return updates
 
@@ -288,7 +310,7 @@ def readRedditData():
 
 
 # Creates a random graph with parameters to adjust size, density, max degree and the variation present in these values
-def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeVariation=None, densityVariation=None, maxDegreeVariation=None):
+def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeVariation=None, densityVariation=None, maxDegreeVariation=None, prioritized=False):
 
     G = nx.Graph() 
 
@@ -342,8 +364,26 @@ def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeV
     # Create the graphs edges
     edgeSet = []
 
+    #If we want prioritized nodes, disregard max degree parameter
+    if prioritized:
+        priorities = []
+        for i in range(0, len(allEdges)):
+            priorities.append(random.uniform(0, 1))
+        
+        remainingEdges = fEdges
+
+        while remainingEdges > 0:
+            edge = random.sample(allEdges, 1)[0]
+            index = allEdges.index(edge)
+
+            if random.uniform(0, 1) < priorities[index]:
+                edgeSet.append(edge)
+                allEdges.remove(edge)
+                priorities.pop(index)
+                remainingEdges -= 1
+
     # If we require a certain max degree first ensure one node fulfills this requirement
-    if fMaxDegree != None:
+    elif fMaxDegree != None:
 
         # Create an array which keeps track of the current degree of each node
         degreeCounter = []
