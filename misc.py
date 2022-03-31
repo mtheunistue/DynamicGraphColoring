@@ -279,6 +279,9 @@ class UpdateIterator:
     def __init__(self, algo, updates):
         self.algo = algo
         self.updateIterator = iter(updates)
+        self.elemCounter = 0
+        self.avgElemCounter = 0
+        self.updateCounter = 0
     
     # Uses the given algorithm to run the next i updates
     def runUpdate(self, i):
@@ -288,7 +291,11 @@ class UpdateIterator:
                 #print("No more updates in given update sequence")
                 return False
             else:
-                self.algo.addEdge(update[0], update[1])
+                cnt = self.algo.addEdge(update[0], update[1])
+                if cnt != None:
+                    self.updateCounter += 1
+                    self.elemCounter += cnt
+                    self.avgElemCounter = float(self.elemCounter)/self.updateCounter
         return True
 
 

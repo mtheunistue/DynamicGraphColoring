@@ -22,6 +22,8 @@ class StaticDynamicAlgo:
 
         self.DBB = RandomWarmUp1.WarmUp1Algo(Gp)     # Dynamic black-box algorithm to be used
 
+        self.elemCounter = 0                        # Counter for elementary operations
+
         self.fullReset()
 
 
@@ -29,6 +31,7 @@ class StaticDynamicAlgo:
     # Automatically updates the staticColoring variable
     def staticBlackBox(self, g, level):
         newStaticColoring = misc.useUniquePalette(nx.coloring.greedy_color(g), level)
+        self.elemCounter += g.number_of_nodes()
         self.staticColoring.update(newStaticColoring)
 
         for node in g.nodes(): 
@@ -41,7 +44,8 @@ class StaticDynamicAlgo:
 
 
     def dynamicBlackBox(self, s, t):
-        self.DBB.addEdge(s, t)
+        cnt = self.DBB.addEdge(s, t)
+        self.elemCounter += cnt
 
 
     # Resets all variables, only called during initialization and when the end of the segment at level 0 is reached
@@ -108,19 +112,23 @@ class StaticDynamicAlgo:
         if not self.G.has_edge(s, t):    # Potentially redundant
             print("Edge not present in graph")
             return
+        self.elemCounter = 0
         self.G.remove_edge(s, t)
         if self.DBB.G.has_edge(s, t):
             self.DBB.removeEdge(s, t)
         #self.updateStep()                 # Does not count as an update
+        return self.elemCounter
 
     def removeVertex(self, v):
 
         if not self.G.has_node(v):   # Potentially redundant
             print("Node not present in graph")
             return
+        self.elemCounter = 0
         self.G.remove_node(v)
         self.DBB.removeVertex(v)
         #self.updateStep()                 # Does not count as an update
+        return self.elemCounter
 
     def addEdge(self, s, t):
 
@@ -131,6 +139,7 @@ class StaticDynamicAlgo:
             print("Not all nodes present in graph yet")
             return
 
+        self.elemCounter = 0
         self.G.add_edge(s, t)
         self.DBB.G.add_edge(s, t)       # Add edge to G' directly, without running the dynamic algorithm
 
@@ -154,14 +163,17 @@ class StaticDynamicAlgo:
 
         if self.DBB.G.has_edge(s, t):    # If edge still in G' after update step, run dynamic algorithm
             self.DBB.removeEdge(s, t)
-            self.dynamicBlackBox(s, t) 
+            self.dynamicBlackBox(s, t)
+        return self.elemCounter 
 
     def addVertex(self, v):
         if self.G.has_node(v):   # Potentially redundant, depending on the input used during the experiments
             print("Node already present in graph")
             return
+        self.elemCounter = 0
         self.G.add_node(v)
         self.staticColoring[v] = 'L0C0'
         self.G.nodes[v]['recentDegree'] = 0
         self.DBB.addVertex(v)
         #self.updateStep()                 # Does not count as an update
+        return self.elemCounter

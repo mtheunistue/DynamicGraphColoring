@@ -10,6 +10,8 @@ class WarmUp2Algo:
         self.G = G.copy()                           # Initial graph
         self.changeCounter = 0                      # Initialize changeCounter to 0
         self.maxDegreeBound = maxDegreeBound        # Optional maximum degree bound for defining the set of available colors
+
+        self.elemCounter = 0                        # Counter for elementary operations
         
         nx.set_node_attributes(self.G, 0, 'color')       # Reset all colors to 0
         nx.set_node_attributes(self.G, 0, 'changed')     # Reset all change integers to 0
@@ -30,6 +32,7 @@ class WarmUp2Algo:
         occupiedColors: set = set({})
         doubleOccupiedColors: set = set({})
         for neighbor in neighbors:
+            self.elemCounter += 1
             color = self.G.nodes[neighbor]['color']
             if color in occupiedColors:
                 doubleOccupiedColors.add(color)
@@ -68,13 +71,17 @@ class WarmUp2Algo:
         if not self.G.has_edge(s, t):    # Potentially redundant
             print("Edge not present in graph")
             return
+        self.elemCounter = 0
         self.G.remove_edge(s, t)
+        return self.elemCounter
 
     def removeVertex(self, v):
         if not self.G.has_node(v):   # Potentially redundant
             print("Node not present in graph")
             return
+        self.elemCounter = 0
         self.G.remove_node(v)
+        return self.elemCounter
 
     def addEdge(self, s, t):
         if self.G.has_edge(s, t):    # Potentially redundant, but could be extended to also check if the vertices are present yet
@@ -84,6 +91,7 @@ class WarmUp2Algo:
             print("Not all nodes present in graph yet")
             return
 
+        self.elemCounter = 0
         self.G.add_edge(s, t)
 
         # Check if colors of endpoints are the same, if so, choose a new color for one of the neighbours
@@ -97,15 +105,18 @@ class WarmUp2Algo:
                 self.recolor(s)
             else:
                 self.recolor(t)
+        return self.elemCounter
 
 
     def addVertex(self, v):
         if self.G.has_node(v):   # Potentially redundant, depending on the input used during the experiments
             print("Node already present in graph")
             return
+        self.elemCounter = 0
         self.G.add_node(v)
         self.G.nodes[v]['color'] = 0
         self.G.nodes[v]['changed'] = 0
+        return self.elemCounter
 
 
     # Returns a coloring dictionary from the nodes 'color' attributes

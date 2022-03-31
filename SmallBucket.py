@@ -32,6 +32,9 @@ class SmallBucketAlgo:
         self.nr = self.G.number_of_nodes    # Initialize nr to 0
         self.staticColoring = {}            # Coloring at any moment
         self.bucketLevels = []
+
+        self.elemCounter = 0                        # Counter for elementary operations
+
         self.resetBuckets(self.G)
 
     
@@ -72,6 +75,7 @@ class SmallBucketAlgo:
         self.bucketLevels.append([Bucket(self.nr, self.d)])
         
         self.staticColoring = nx.coloring.greedy_color(G)
+        self.elemCounter += G.number_of_nodes()
         
 
     # Update bucket contents and recolor subgraphs
@@ -83,6 +87,7 @@ class SmallBucketAlgo:
             # Simply recompute the coloring of the most recent bucket and return
             if self.isEmptyBucketOnLevel(i)[0]:
                 b.coloring = nx.coloring.greedy_color(self.G.subgraph(b.vertices))
+                self.elemCounter += len(b.vertices)
                 return
             else:
                 # Else, empty all level i buckets into a single level i+1 bucket, update b to point at new bucket
@@ -98,7 +103,9 @@ class SmallBucketAlgo:
         if not self.G.has_edge(s, t):    # Potentially redundant
             print("Edge not present in graph")
             return
+        self.elemCounter = 0
         self.G.remove_edge(s, t)
+        return self.elemCounter
 
     def removeVertex(self, v):
 
@@ -106,10 +113,12 @@ class SmallBucketAlgo:
             print("Node not present in graph")
             return
 
+        self.elemCounter = 0
         b = self.G.nodes[v]['bucket']
         if b != None:
             b.removeVertices(self.G, [v])
         self.G.remove_node(v)
+        return self.elemCounter
 
     def addEdge(self, s, t):
 
@@ -120,7 +129,7 @@ class SmallBucketAlgo:
             print("Not all nodes present in graph yet")
             return
 
-
+        self.elemCounter = 0
         self.G.add_edge(s, t)
         # Select one of the endpoints at random, remove it from a bucket and add it as usual
         if bool(random.getrandbits(1)):
@@ -136,16 +145,18 @@ class SmallBucketAlgo:
         bucket = self.bucketLevels[0][self.isEmptyBucketOnLevel(0)[1]]
         bucket.addVertices(self.G, [v])
         self.updateBuckets(bucket)
+        return self.elemCounter
 
     def addVertex(self, v):
         if self.G.has_node(v):   # Potentially redundant, depending on the input used during the experiments
             print("Node already present in graph")
             return
+        self.elemCounter = 0
         self.G.add_node(v)
         bucket = self.bucketLevels[0][self.isEmptyBucketOnLevel(0)[1]]
         bucket.addVertices(self.G, [v])
         self.updateBuckets(bucket)
-
+        return self.elemCounter
 
     def getColoring(self):
         bucketColorings = [misc.useUniquePalette(self.staticColoring, 0)]

@@ -17,6 +17,8 @@ class DcOrientAlgo:
         self.G = G.copy()                                         # Undirected graph G
         self.Gstar = nx.DiGraph()                                 # Directed graph Gstar, used for everything within the algorithm
 
+        self.elemCounter = 0                        # Counter for elementary operations
+
         self.Gstar.add_nodes_from(self.G.nodes())
         nx.set_node_attributes(self.Gstar, 0, 'color')                      # Reset all colors to 0
         for node in self.Gstar.nodes():
@@ -76,6 +78,7 @@ class DcOrientAlgo:
 
 
     def dincColorIncrease(self, u, v=None, c=None):
+        self.elemCounter += 1
         I = self.Gstar.nodes[u]['DINC']
         if v != None:
             c = self.Gstar.nodes[v]['color']
@@ -91,6 +94,7 @@ class DcOrientAlgo:
 
 
     def dincColorDecrease(self, u, v):
+        self.elemCounter += 1
         I = self.Gstar.nodes[u]['DINC']
         c = self.Gstar.nodes[v]['color']
        
@@ -205,15 +209,19 @@ class DcOrientAlgo:
     def removeEdge(self, s, t):
         if not self.G.has_edge(s, t):    # Potentially redundant
             return
+        self.elemCounter = 0
         self.G.remove_edge(s, t)
         self.dcOrientDelete(s, t)
+        return self.elemCounter
 
     def removeVertex(self, v):
 
         if not self.G.has_node(v):   # Potentially redundant
             return
+        self.elemCounter = 0
         self.G.remove_node(v)
         self.Gstar.remove_node(v)
+        return self.elemCounter
 
     def addEdge(self, s, t):
 
@@ -222,16 +230,20 @@ class DcOrientAlgo:
         if (not self.G.has_node(s) or not self.G.has_node(t)):
 
             return
+        self.elemCounter = 0
         self.G.add_edge(s, t)
         self.dcOrientInsert(s,t)
+        return self.elemCounter
 
     def addVertex(self, v):
         if self.G.has_node(v):   # Potentially redundant, depending on the input used during the experiments
             return
+        self.elemCounter = 0
         self.G.add_node(v)
         self.Gstar.add_node(v)
         self.Gstar.nodes[v]['color'] = 0
         self.Gstar.nodes[v]['DINC'] = DincIndex()
+        return self.elemCounter
 
 
     
