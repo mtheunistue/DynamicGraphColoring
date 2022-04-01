@@ -374,19 +374,18 @@ def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeV
     #If we want prioritized nodes, disregard max degree parameter
     if prioritized:
         priorities = []
-        for i in range(0, len(allEdges)):
+        for i in range(0, fSize):
             priorities.append(random.uniform(0, 1))
         
         remainingEdges = fEdges
 
         while remainingEdges > 0:
             edge = random.sample(allEdges, 1)[0]
-            index = allEdges.index(edge)
+            priority = priorities[edge[0]] + priorities[edge[1]]
 
-            if random.uniform(0, 1) < priorities[index]:
+            if random.uniform(0, 2) < priority:
                 edgeSet.append(edge)
                 allEdges.remove(edge)
-                priorities.pop(index)
                 remainingEdges -= 1
 
     # If we require a certain max degree first ensure one node fulfills this requirement
