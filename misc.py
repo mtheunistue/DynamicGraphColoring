@@ -227,7 +227,7 @@ def extractUpdates(G, ordering=None):
         # Get priority for nodes   
         priorities = []
         for i in range(0, len(nodes)):
-            priorities.append(int(random.uniform(1, 100)))          # Perhaps scaling is possible here
+            priorities.append(pow(int(random.uniform(1, 1000)), 100))          # Perhaps scaling is possible here, currently scaling has been taken to the extreme
 
         while len(edges) > 0:
             # Pick a random node
@@ -317,7 +317,7 @@ def readRedditData():
 
 
 # Creates a random graph with parameters to adjust size, density, max degree and the variation present in these values
-def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeVariation=None, densityVariation=None, maxDegreeVariation=None, prioritized=False):
+def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeVariation=None, densityVariation=None, maxDegreeVariation=None, prioritized: int=None):
 
     G = nx.Graph() 
 
@@ -372,7 +372,7 @@ def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeV
     edgeSet = []
 
     #If we want prioritized nodes, disregard max degree parameter
-    if prioritized:
+    if prioritized != None:
         priorities = []
         for i in range(0, fSize):
             priorities.append(random.uniform(0, 1))
@@ -381,12 +381,20 @@ def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeV
 
         while remainingEdges > 0:
             edge = random.sample(allEdges, 1)[0]
-            priority = priorities[edge[0]] + priorities[edge[1]]
+            if prioritized == 0:
+                priority = priorities[edge[0]] + priorities[edge[1]]
 
-            if random.uniform(0, 2) < priority:
-                edgeSet.append(edge)
-                allEdges.remove(edge)
-                remainingEdges -= 1
+                if random.uniform(0, 2) < priority:
+                    edgeSet.append(edge)
+                    allEdges.remove(edge)
+                    remainingEdges -= 1
+            else:
+                priority = pow(priorities[edge[0]], prioritized) * pow(priorities[edge[1]], prioritized)
+
+                if random.uniform(0, 1) < priority:
+                    edgeSet.append(edge)
+                    allEdges.remove(edge)
+                    remainingEdges -= 1
 
     # If we require a certain max degree first ensure one node fulfills this requirement
     elif fMaxDegree != None:
