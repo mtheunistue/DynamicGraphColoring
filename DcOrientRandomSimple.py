@@ -59,6 +59,8 @@ class DcOrientRandomSimpleAlgo:
                 break
         if self.Gstar.nodes[u]['color'] != colorNew:
             self.Gstar.nodes[u]['color'] = colorNew
+            self.changeCounter += 1      # update change counter
+            self.Gstar.nodes[u]['changed'] = self.changeCounter
             return True
         else:
             return False
@@ -127,21 +129,64 @@ class DcOrientRandomSimpleAlgo:
                 S.add(nbr)
         return S
 
+    def recolor(self, node):
+        self.changeCounter += 1      # update change counter
+        self.Gstar.nodes[node]['changed'] = self.changeCounter
+
+        # Create set of all colors occupied by neighbours
+        neighbors = list(self.G.neighbors(node))
+        occupiedColors: set = set({})
+        for neighbor in neighbors:
+            occupiedColors.add(self.Gstar.nodes[neighbor]['color'])
+
+        # Create set of all available colors to this node
+        colors: set = set({})
+        for i in range(0, self.Gstar.degree[node]+1):
+            if i not in occupiedColors:
+                colors.add(i)
+
+        
+        # Select random color from available colors
+        self.Gstar.nodes[node]['color'] = random.choice(tuple(colors))
 
     def dcOrientInsert(self, u, v):
-        q = PriorityQueue()
-        S = self.ocgInsert(u, v)
-        for w in S:
-            q.put((self.nodePriority(w), w))
-        self.CAN(q)
+        b = random.uniform(0, 1) <= self.p
+        if b:
+            self.ocgInsert(u, v)
+            # Check if colors of endpoints are the same, if so, choose a new color for one of the neighbours
+            # Recolor the neighbor that has most recently been recolored. If this value is the same (only possible on 'new' nodes) pick one at random
+            if self.Gstar.nodes[u]['color'] == self.Gstar.nodes[v]['color']:
+                if self.Gstar.nodes[u]['changed'] > self.Gstar.nodes[v]['changed']:
+                    self.recolor(u)
+                elif self.Gstar.nodes[v]['changed'] > self.Gstar.nodes[u]['changed']:
+                    self.recolor(v)
+                elif bool(random.getrandbits(1)):
+                    self.recolor(u)
+                else:
+                    self.recolor(v)
+        else:
+            q = PriorityQueue()
+            S = self.ocgInsert(u, v)
+            for w in S:
+                q.put((self.nodePriority(w), w))
+            self.CAN(q)
 
 
     def dcOrientDelete(self, u, v):
-        q = PriorityQueue()
-        S = self.ocgDelete(u, v)
-        for w in S:
-            q.put((self.nodePriority(w), w))
-        self.CAN(q)
+        b = random.uniform(0, 1) <= self.p
+        if b:
+            if not self.Gstar.has_edge(u, v):
+                # If this edge is not in Gstar it must be present in the opposite direction
+                x = u
+                u = v
+                v = x
+            self.Gstar.remove_edge(u, v)
+        else:
+            q = PriorityQueue()
+            S = self.ocgDelete(u, v)
+            for w in S:
+                q.put((self.nodePriority(w), w))
+            self.CAN(q)
 
 
     # Returns a coloring dictionary from the nodes 'color' attributes
