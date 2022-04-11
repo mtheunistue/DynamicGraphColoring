@@ -8,28 +8,19 @@ from queue import PriorityQueue
 
 class DcOrientRandomSimpleAlgo:
     def __init__(self, G: nx.Graph = nx.Graph(), p = 0.5):                         # Initial graph
-        self.changeCounter = 0                      # Initialize changeCounter to 0
-        self.p = p                                  # Probability of randomizing color instead of using priority ordering
-        
-        self.Gstar = nx.DiGraph()
+        self.G = G.copy()                                         # Undirected graph G
+        self.Gstar = nx.DiGraph()                                 # Directed graph Gstar, used for everything within the algorithm
+        self.changeCounter = 0                                    # Initialize changeCounter to 0
+        self.p = p                                                # Probability of taking a random step
 
-        self.Gstar.add_nodes_from(G.nodes())
-        nx.set_node_attributes(self.Gstar, 0, 'color')                 # Reset all colors to 0
+        self.elemCounter = 0                        # Counter for elementary operations
+
+        self.Gstar.add_nodes_from(self.G.nodes())
+        nx.set_node_attributes(self.Gstar, 0, 'color')                      # Reset all colors to 0
         nx.set_node_attributes(self.Gstar, 0, 'changed')               # Reset all change counters to 0
-        self.G = nx.Graph()
-        self.G.add_nodes_from(G.nodes())
-        self.G.add_edges_from(G.edges())
 
         for edge in self.G.edges():
-            if self.isBefore(edge[0], edge[1]):
-                self.Gstar.add_edge(edge[0], edge[1])
-            else:
-                self.Gstar.add_edge(edge[1], edge[0])
-
-        # Initialize graph nodes by setting their colors correctly
-        initColoring = nx.coloring.greedy_color(self.Gstar)
-        for node in self.Gstar.nodes():
-            self.Gstar.nodes[node]['color'] = initColoring[node]
+            self.dcOrientInsert(edge[0], edge[1])
 
 
     def nodePriority(self, node):
@@ -141,7 +132,7 @@ class DcOrientRandomSimpleAlgo:
 
         # Create set of all available colors to this node
         colors: set = set({})
-        for i in range(0, self.Gstar.degree[node]+1):
+        for i in range(0, self.G.degree[node]+1):
             if i not in occupiedColors:
                 colors.add(i)
 
@@ -180,8 +171,13 @@ class DcOrientRandomSimpleAlgo:
                 x = u
                 u = v
                 v = x
-            self.Gstar.remove_edge(u, v)
+            self.ocgDelete(u, v)
         else:
+            if not self.Gstar.has_edge(u, v):
+                # If this edge is not in Gstar it must be present in the opposite direction
+                x = u
+                u = v
+                v = x
             q = PriorityQueue()
             S = self.ocgDelete(u, v)
             for w in S:

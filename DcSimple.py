@@ -28,15 +28,8 @@ class DcSimpleAlgo:
             self.Gstar.nodes[node]['DINC'] = DincIndex()               # Initialize all DINC indices
 
         for edge in self.G.edges():
-            if self.isBefore(edge[0], edge[1]):
-                self.Gstar.add_edge(edge[0], edge[1])
-            else:
-                self.Gstar.add_edge(edge[1], edge[0])
+            self.dcOrientInsert(edge[0], edge[1])
 
-        # Initialize graph nodes by setting their colors correctly
-        initColoring = nx.coloring.greedy_color(self.Gstar)
-        for node in self.Gstar.nodes():
-            self.Gstar.nodes[node]['color'] = initColoring[node]
 
 
     def nodePriority(self, node):
@@ -222,6 +215,7 @@ class DcSimpleAlgo:
 
 
     def dcOrientDelete(self, u, v):
+        # Chance for a randomized step can be added here, much like with insert
         q = PriorityQueue()
         S = self.ocgDelete(u, v)
         for w in S:
@@ -240,7 +234,7 @@ class DcSimpleAlgo:
 
         # Create set of all available colors to this node
         colors: set = set({})
-        for i in range(0, self.Gstar.degree[node]+1):
+        for i in range(0, self.G.degree[node]+1):
             if i not in occupiedColors:
                 colors.add(i)
 

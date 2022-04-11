@@ -270,8 +270,85 @@ def extractUpdates(G, ordering=None):
             updates[index] = edge
             freeIndices.remove(index)
 
-    return updates
+    # Append a True boolean to updates list for compatibility with update iterator
+    # This means all updates returned by this extractor are edge additions
+    addUpdates = []
+    for update in updates:
+        addUpdates.append([update, True])
 
+    return addUpdates
+
+def extractStream(G: nx.Graph, length: int, addProb=0.5, ordering='random'):
+    selection = ['random', 'timeout']
+    if ordering not in selection:
+        raise ValueError("Invalid ordering choice. Expected one of: %s" % selection)
+    
+    updates = []
+    edges = list(G.edges())
+    nodes = list(G.nodes())
+
+    # Ensure the lower numbered node appears first in each edge
+    for edge in edges.copy():
+        if edge[0] > edge[1]:
+            edges.remove(edge)
+            edges.append(edge[1], edge[0])
+
+    allEdges = []
+    for node1 in nodes:
+        for node2 in nodes:
+            if node1 < node2:
+                allEdges.append((node1, node2))
+
+    availableEdges = []
+    for edge in allEdges:
+        if edge not in edges:
+            availableEdges.append(edge)
+
+    if ordering == 'random':
+        while len(updates) < length:
+            if random.uniform(0, 1) < addProb:
+                # Add an edge
+                if len(availableEdges) > 0:
+                    edge = random.sample(availableEdges, 1)[0]
+                    availableEdges.remove(edge)
+                    edges.append(edge)
+                    updates.append([edge, True])
+            else:
+                # Remove an edge
+                if len(edges) > 0:
+                    edge = random.sample(edges, 1)[0]
+                    edges.remove(edge)
+                    availableEdges.append(edge)
+                    updates.append([edge, False])
+
+    elif ordering == 'timeout':
+        age = []
+        for edge in edges:
+            age.append(0)
+
+        while len(updates) < length:
+            if random.uniform(0, 1) < addProb:
+                # Add an edge
+                if len(availableEdges) > 0:
+                    edge = random.sample(availableEdges, 1)[0]
+                    availableEdges.remove(edge)
+                    edges.append(edge)
+                    age.append(0)
+                    updates.append([edge, True])
+            else:
+                # Remove an edge
+                if len(edges) > 0:
+                    edge = random.choices(edges, weights=age, k=1)[0]
+                    index = edges.index(edge)
+                    age.pop(index)
+                    edges.remove(edge)
+                    availableEdges.append(edge)
+                    updates.append([edge, False])
+            
+            for i in range(0, len(age)):
+                age[i] += 1
+
+    return updates
 
 # Iterates over a list of updates, for easier testing
 # Can be extended to work with updates other than edge insertions as well
@@ -291,11 +368,12 @@ class UpdateIterator:
                 #print("No more updates in given update sequence")
                 return False
             else:
-                cnt = self.algo.addEdge(update[0], update[1])
-                if cnt != None:
-                    self.updateCounter += 1
-                    self.elemCounter += cnt
-                    self.avgElemCounter = float(self.elemCounter)/self.updateCounter
+                edge = update[0]
+                add = update[1]
+                if add:
+                    self.algo.addEdge(edge[0], edge[1])
+                else: self.algo.removeEdge(edge[0], edge[1])
+                
         return True
 
 
