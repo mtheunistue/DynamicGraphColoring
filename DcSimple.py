@@ -216,11 +216,15 @@ class DcSimpleAlgo:
 
     def dcOrientDelete(self, u, v):
         # Chance for a randomized step can be added here, much like with insert
-        q = PriorityQueue()
-        S = self.ocgDelete(u, v)
-        for w in S:
-            q.put((self.nodePriority(w), w))
-        self.CAN(q)
+        b = random.uniform(0, 1) <= self.p
+        if b:
+            self.ocgDelete(u, v)
+        else:
+            q = PriorityQueue()
+            S = self.ocgDelete(u, v)
+            for w in S:
+                q.put((self.nodePriority(w), w))
+            self.CAN(q)
 
     def recolor(self, node):
         self.changeCounter += 1      # update change counter

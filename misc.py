@@ -324,7 +324,7 @@ def extractStream(G: nx.Graph, length: int, addProb=0.5, ordering='random'):
     elif ordering == 'timeout':
         age = []
         for edge in edges:
-            age.append(0)
+            age.append(1)
 
         while len(updates) < length:
             if random.uniform(0, 1) < addProb:
@@ -333,7 +333,7 @@ def extractStream(G: nx.Graph, length: int, addProb=0.5, ordering='random'):
                     edge = random.sample(availableEdges, 1)[0]
                     availableEdges.remove(edge)
                     edges.append(edge)
-                    age.append(0)
+                    age.append(1)
                     updates.append([edge, True])
             else:
                 # Remove an edge
