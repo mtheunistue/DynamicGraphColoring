@@ -313,6 +313,9 @@ def extractStream(G: nx.Graph, length: int, addProb=0.5, ordering='random'):
                     availableEdges.remove(edge)
                     edges.append(edge)
                     updates.append([edge, True])
+                else:
+                    print("No more edges available to add")
+                    break
             else:
                 # Remove an edge
                 if len(edges) > 0:
@@ -320,6 +323,9 @@ def extractStream(G: nx.Graph, length: int, addProb=0.5, ordering='random'):
                     edges.remove(edge)
                     availableEdges.append(edge)
                     updates.append([edge, False])
+                else:
+                    print("No more edges available to remove")
+                    break
 
     elif ordering == 'timeout':
         age = []
@@ -335,6 +341,9 @@ def extractStream(G: nx.Graph, length: int, addProb=0.5, ordering='random'):
                     edges.append(edge)
                     age.append(1)
                     updates.append([edge, True])
+                else:
+                    print("No more edges available to add")
+                    break
             else:
                 # Remove an edge
                 if len(edges) > 0:
@@ -344,6 +353,9 @@ def extractStream(G: nx.Graph, length: int, addProb=0.5, ordering='random'):
                     edges.remove(edge)
                     availableEdges.append(edge)
                     updates.append([edge, False])
+                else:
+                    print("No more edges available to remove")
+                    break
             
             for i in range(0, len(age)):
                 age[i] += 1
