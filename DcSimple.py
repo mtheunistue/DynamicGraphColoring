@@ -28,7 +28,7 @@ class DcSimpleAlgo:
             self.Gstar.nodes[node]['DINC'] = DincIndex()               # Initialize all DINC indices
 
         for edge in self.G.edges():
-            self.dcOrientInsert(edge[0], edge[1])
+            self.dcOrientInsert(edge[0], edge[1], override=True)
 
 
 
@@ -185,9 +185,9 @@ class DcSimpleAlgo:
         return S
 
 
-    def dcOrientInsert(self, u, v):
+    def dcOrientInsert(self, u, v, override=False):
         b = random.uniform(0, 1) <= self.p
-        if b:
+        if b and not override:
             if self.isBefore(u, v):
                 S = self.ocgInsert(u, v)
             else:

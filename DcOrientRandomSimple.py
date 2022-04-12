@@ -20,7 +20,7 @@ class DcOrientRandomSimpleAlgo:
         nx.set_node_attributes(self.Gstar, 0, 'changed')               # Reset all change counters to 0
 
         for edge in self.G.edges():
-            self.dcOrientInsert(edge[0], edge[1])
+            self.dcOrientInsert(edge[0], edge[1], override=True)
 
 
     def nodePriority(self, node):
@@ -140,9 +140,9 @@ class DcOrientRandomSimpleAlgo:
         # Select random color from available colors
         self.Gstar.nodes[node]['color'] = random.choice(tuple(colors))
 
-    def dcOrientInsert(self, u, v):
+    def dcOrientInsert(self, u, v, override=False):
         b = random.uniform(0, 1) <= self.p
-        if b:
+        if b and not override:
             self.ocgInsert(u, v)
             # Check if colors of endpoints are the same, if so, choose a new color for one of the neighbours
             # Recolor the neighbor that has most recently been recolored. If this value is the same (only possible on 'new' nodes) pick one at random
