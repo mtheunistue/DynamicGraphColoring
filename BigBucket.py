@@ -73,7 +73,6 @@ class BigBucketAlgo:
         self.bucketLevels.append([Bucket(s, self.nr, self.d)])
         
         self.staticColoring = nx.coloring.greedy_color(G)
-        self.elemCounter += G.number_of_nodes()
         
 
     # Update bucket contents and recolor subgraphs
@@ -85,7 +84,6 @@ class BigBucketAlgo:
             # Simply recompute the coloring of the most recent bucket and return
             if self.isEmptyBucketOnLevel(i):
                 b.coloring = nx.coloring.greedy_color(self.G.subgraph(b.vertices))
-                self.elemCounter += len(b.vertices)
                 return
             else:
                 # Else, empty all level i buckets into a single level i+1 bucket, update b to point at new bucket

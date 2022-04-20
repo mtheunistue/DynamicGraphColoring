@@ -31,7 +31,6 @@ class StaticDynamicAlgo:
     # Automatically updates the staticColoring variable
     def staticBlackBox(self, g, level):
         newStaticColoring = misc.useUniquePalette(nx.coloring.greedy_color(g), level)
-        self.elemCounter += g.number_of_nodes()
         self.staticColoring.update(newStaticColoring)
 
         for node in g.nodes(): 
@@ -45,7 +44,6 @@ class StaticDynamicAlgo:
 
     def dynamicBlackBox(self, s, t):
         cnt = self.DBB.addEdge(s, t)
-        self.elemCounter += cnt
 
 
     # Resets all variables, only called during initialization and when the end of the segment at level 0 is reached

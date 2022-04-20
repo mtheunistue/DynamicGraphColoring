@@ -78,7 +78,6 @@ class DcOrientAlgo:
 
 
     def dincColorIncrease(self, u, v=None, c=None):
-        self.elemCounter += 1
         I = self.Gstar.nodes[u]['DINC']
         if v != None:
             c = self.Gstar.nodes[v]['color']
@@ -94,7 +93,6 @@ class DcOrientAlgo:
 
 
     def dincColorDecrease(self, u, v):
-        self.elemCounter += 1
         I = self.Gstar.nodes[u]['DINC']
         c = self.Gstar.nodes[v]['color']
        
