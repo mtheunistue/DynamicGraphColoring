@@ -194,22 +194,25 @@ class DcOrientRandomSimpleAlgo:
 
 
     def removeEdge(self, s, t):
+        self.elemCounter = 0
         if not self.G.has_edge(s, t):    # Potentially redundant
             print("Edge not present in graph")
             return
         self.G.remove_edge(s, t)
         self.dcOrientDelete(s, t)
+        return self.elemCounter
 
     def removeVertex(self, v):
-
+        self.elemCounter = 0
         if not self.G.has_node(v):   # Potentially redundant
             print("Node not present in graph")
             return
         self.G.remove_node(v)
         self.Gstar.remove_node(v)
+        return self.elemCounter
 
     def addEdge(self, s, t):
-
+        self.elemCounter = 0
         if self.G.has_edge(s, t):    # Potentially redundant, but could be extended to also check if the vertices are present yet
             print("Edge already in the graph")
             return
@@ -218,8 +221,10 @@ class DcOrientRandomSimpleAlgo:
             return
         self.G.add_edge(s, t)
         self.dcOrientInsert(s,t)
+        return self.elemCounter
 
     def addVertex(self, v):
+        self.elemCounter = 0
         if self.G.has_node(v):   # Potentially redundant, depending on the input used during the experiments
             print("Node already present in graph")
             return
@@ -227,3 +232,4 @@ class DcOrientRandomSimpleAlgo:
         self.Gstar.add_node(v)
         self.Gstar.nodes[v]['color'] = 0
         self.Gstar.nodes[v]['changed'] = 0
+        return self.elemCounter
