@@ -2,6 +2,7 @@
 import networkx as nx
 import misc
 import math
+import time
 import random
 
 
@@ -29,10 +30,10 @@ class WarmUp1Algo:
         self.G.nodes[node]['changed'] = self.changeCounter
 
         # Create set of all colors occupied by neighbours
+        timer = time.perf_counter()
         neighbors = list(self.G.neighbors(node))
         occupiedColors: set = set({})
         for neighbor in neighbors:
-            self.elemCounter += 1
             occupiedColors.add(self.G.nodes[neighbor]['color'])
 
         # Create set of all available colors to this node
@@ -46,6 +47,7 @@ class WarmUp1Algo:
                 if i not in occupiedColors:
                     colors.add(i)
         
+        self.elemCounter += (time.perf_counter() - timer)
         # Select random color from available colors
         self.G.nodes[node]['color'] = random.choice(tuple(colors))
 

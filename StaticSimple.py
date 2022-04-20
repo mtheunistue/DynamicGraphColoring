@@ -4,6 +4,7 @@ import networkx as nx
 import misc
 import math
 import random
+import time
 import RandomWarmUp1
 
 class StaticSimpleAlgo:
@@ -27,7 +28,6 @@ class StaticSimpleAlgo:
     # Automatically updates the staticColoring variable
     def staticBlackBox(self, g, level):
         newStaticColoring = misc.useUniquePalette(nx.coloring.greedy_color(g), level)
-        self.elemCounter += g.number_of_nodes()
         self.staticColoring.update(newStaticColoring)
 
         for node in g.nodes(): 
@@ -81,21 +81,26 @@ class StaticSimpleAlgo:
             for edge in self.G.edges(node):
                 activeEdges.add(edge)
 
+    
         for edge in activeEdges:
+            timer = time.perf_counter()
             if self.staticColoring.get(edge[0]) == self.staticColoring.get(edge[1]):
+                self.elemCounter += (time.perf_counter() - timer)
                 if bool(random.getrandbits(1)):
                     # Recolor first node
                     self.recolor(edge[0])
                 else:
                     # Recolor second node
                     self.recolor(edge[1])
+            else:
+                self.elemCounter += (time.perf_counter() - timer)
 
     def recolor(self, node):
         # Create set of all colors occupied by neighbours
+        timer = time.perf_counter()
         neighbors = list(self.G.neighbors(node))
         occupiedColors: set = set({})
         for neighbor in neighbors:
-            self.elemCounter += 1
             occupiedColors.add(self.staticColoring.get(neighbor))
 
         # Create set of all available colors to this node
@@ -104,6 +109,7 @@ class StaticSimpleAlgo:
             if i not in occupiedColors:
                 colors.add(i)
 
+        self.elemCounter += (time.perf_counter() - timer)
         # Select random color from available colors
         self.staticColoring[node] = random.choice(tuple(colors))
 

@@ -4,6 +4,7 @@ import misc
 import math
 import random
 from queue import PriorityQueue
+import time
 
 
 class DcOrientRandomSimpleAlgo:
@@ -36,9 +37,11 @@ class DcOrientRandomSimpleAlgo:
 
     def collectColor(self, u):
         C = set({})
+        timer = time.perf_counter()
         for edge in self.Gstar.in_edges(u):
             v = edge[0]
             C.add(self.Gstar.nodes[v]['color'])
+        self.elemCounter += (time.perf_counter() - timer)
         return C
 
 
@@ -124,6 +127,7 @@ class DcOrientRandomSimpleAlgo:
         self.changeCounter += 1      # update change counter
         self.Gstar.nodes[node]['changed'] = self.changeCounter
 
+        timer = time.perf_counter()
         # Create set of all colors occupied by neighbours
         neighbors = list(self.G.neighbors(node))
         occupiedColors: set = set({})
@@ -135,7 +139,7 @@ class DcOrientRandomSimpleAlgo:
         for i in range(0, self.G.degree[node]+1):
             if i not in occupiedColors:
                 colors.add(i)
-
+        self.elemCounter += (time.perf_counter() - timer)
         
         # Select random color from available colors
         self.Gstar.nodes[node]['color'] = random.choice(tuple(colors))
