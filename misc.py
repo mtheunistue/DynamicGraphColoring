@@ -527,3 +527,92 @@ def createRandomGraph(size=30, density=0.5, variation=0.5, maxDegree=None, sizeV
     G.add_edges_from(edgeSet)
 
     return G
+
+# Saves the provided lists in a file with the name passed as parameter
+# Use this to store data for later use
+# Only integers, booleans and integer tuples are supported
+# Other datatypes 
+def saveLists (lists, experimentName):
+    with open('experiments/'+experimentName, 'w') as fp:
+        for list in lists:
+            for elem in list:
+                if (type(elem) is tuple):
+                    fp.write('(' +str(elem[0]) + ' ' + str(elem[1]) + ')')
+                else:
+                    fp.write(str(elem))
+                fp.write(',')
+            fp.write('\n')
+
+
+# Loads lists from a simple (text) file, as stored by the saveList() method
+# Automatically converts strings to integers, booleans and integer tuples if necessary
+def loadLists (experimentName):
+    lists = []
+    with open('experiments/'+experimentName, 'r') as fr:
+        lines = fr.readlines()
+        for line in lines:
+            lineList = list(line.split(','))[:-1]
+            for i in range(0, len(lineList)):
+                if (lineList[i].isnumeric()):
+                    lineList[i] = int(lineList[i])
+                elif (lineList[i] in ['True', 'False']):
+                    lineList[i] = lineList[i] == 'True'
+                elif (lineList[i][:1] == '('):
+                    lineList[i] = (int(lineList[i][1:-1].split(' ')[0]), int(lineList[i][1:-1].split(' ')[1]))
+            lists.append(lineList)
+    return lists
+
+# Class to hold loaded graph data
+class GraphData:
+
+  def __init__(self, name, nodes, edges, updateEdges, updateTypes, staticColors, staticRecolors):
+      self.name = name
+      self.G = nx.Graph()
+      self.G.add_nodes_from(nodes)
+      self.G.add_edges_from(edges)
+      self.staticColors = staticColors
+      self.staticRecolors = staticRecolors
+      self.updates = []
+
+      self.colorSum = 0
+      self.recolorSum = 0
+      for i in range(0, len(updateEdges)):
+          self.updates.append([updateEdges[i], updateTypes[i]])
+          self.colorSum += staticColors[i]
+          self.recolorSum += staticRecolors[i]      
+      self.updateLength = len(self.updates)
+
+# Saves graph data in a file
+def saveGraphData (graphData: GraphData):
+    nodes = list(graphData.G.nodes())
+    edges = list(graphData.G.edges())
+    updateEdges = (update[0] for update in graphData.updates)
+    updateTypes = (update[1] for update in graphData.updates)
+    staticColors = graphData.staticColors
+    staticRecolors = graphData.staticRecolors
+
+    saveData = []
+    saveData.append(nodes)
+    saveData.append(edges)
+    saveData.append(updateEdges)
+    saveData.append(updateTypes)
+    saveData.append(staticColors)
+    saveData.append(staticRecolors)
+
+    saveLists(saveData, graphData.name)
+
+
+# Loads graph data from a file
+def loadGraphData (name):
+    data = loadLists(name)
+    
+    nodes = data[0]
+    edges = data[1]
+    updateEdges = data[2]
+    updateTypes = data[3]
+    staticColors = data[4]
+    staticRecolors = data[5]
+
+    graphData = GraphData(name, nodes, edges, updateEdges, updateTypes, staticColors, staticRecolors)
+
+    return graphData
