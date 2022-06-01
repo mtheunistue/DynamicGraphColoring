@@ -175,7 +175,7 @@ def graphInfo(G):
     print("Density: " + str(nx.density(G)))
     print("Max Degree: " + str(getMaxDegree(G)))
     print("Average Degree: " + str(getAverageDegree(G)))
-    print("Static Coloring uses " + str(numberOfColors(nx.coloring.greedy_color(G))) + " colors")
+    print("Static Coloring uses " + str(numberOfColors(nx.coloring.greedy_color(G))) + " colors at the end")
 
 
 # Extracts updates from a (generated) graph G
