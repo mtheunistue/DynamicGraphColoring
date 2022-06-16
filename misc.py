@@ -383,8 +383,8 @@ class UpdateIterator:
                 edge = update[0]
                 add = update[1]
                 if add:
-                    self.elemCounter += self.algo.addEdge(edge[0], edge[1])
-                else: self.elemCounter += self.algo.removeEdge(edge[0], edge[1])
+                    self.algo.addEdge(edge[0], edge[1])
+                else: self.algo.removeEdge(edge[0], edge[1])
                 self.updateCounter += 1
                 self.avgElemCounter = float(self.elemCounter) / self.updateCounter
                 
