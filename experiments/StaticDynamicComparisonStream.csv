@@ -1,0 +1,5 @@
+207 Nodes; 7315 Edges; C = 24.54,Average nr. of Recolors,Average nr. of Colors,Time Taken (s)
+Static-Dynamic(l = 10) no dynamic reset,0.51,124.94,2.513
+Static-Dynamic (l = 10) dynamic reset,0.56,108.34,2.814
+Static-Dynamic (l = 100) no dynamic reset,0.11,157.7,2.421
+Static-Dynamic (l = 100) dynamic reset,0.11,157.13,2.336
