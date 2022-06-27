@@ -1,0 +1,11 @@
+244 Nodes; 12542 Edges; C = 18.56,Average nr. of Recolors,Average nr. of Colors,Time Taken (s)
+Random Warm-Up,0.06,48.89,1.85
+Small-Bucket algorithm (d = 5),3.57,47.82,4.801
+Big-Bucket algorithm (d = 5),5.1,33.48,6.033
+Static-Dynamic algorithm (l = 10),1.08,111.9,4.677
+Static-Dynamic algorithm (l = 100),0.18,132.83,4.124
+DC-Orient,24.53,18.56,82.752
+Static-Simple algorithm (l = 10),0.92,42.24,2.738
+Static-Simple algorithm (l = 100),0.15,60.09,2.016
+DC-Simple (p = 0.8),7.22,20.87,32.101
+DC-Simple (p = 0.998),0.31,34.51,10.429

@@ -1,0 +1,5 @@
+225 Nodes; 9148 Edges; C = 27.37,Average nr. of Recolors,Average nr. of Colors,Time Taken (s)
+Basic DC-Simple (p = 0.8),9.32,27.76,277.483
+Optimized DC-Simple (p = 0.8),9.24,27.86,39.038
+Basic DC-Simple (p = 0.998),0.26,38.2,17.299
+Optimized DC-Simple (p = 0.998),0.22,42.37,11.105

@@ -1,0 +1,5 @@
+161 Nodes; 4043 Edges; C = 18.72,Average nr. of Recolors,Average nr. of Colors,Time Taken (s)
+Random Warm-Up (local degrees),0.01,53.7,1.012
+Random Warm-Up 2 (local degrees),0.03,52.95,0.991
+Random Warm-Up (max degree),0.01,80.79,0.951
+Random Warm-Up 2 (max degree),0.01,82.55,0.947
