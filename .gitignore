@@ -25,4 +25,4 @@ ipython_config.py
 *.csv
 *.txt
 
-!*/experiments/*
+!experiments/*
