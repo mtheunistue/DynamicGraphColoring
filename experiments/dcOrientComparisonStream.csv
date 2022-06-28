@@ -1,0 +1,3 @@
+225 Nodes; 13645 Edges; C = 40.06,Average nr. of Recolors,Average nr. of Colors,Time Taken (s)
+DC-Orient without optimizations,38.3,40.06,2073.542
+DC-Orient with optimizations,38.3,40.06,172.858
