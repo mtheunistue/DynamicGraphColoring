@@ -545,7 +545,7 @@ def saveLists (lists, experimentName):
 
 
 # Loads lists from a simple (text) file, as stored by the saveList() method
-# Automatically converts strings to integers, booleans and integer tuples if necessary
+# Automatically converts strings to integers, booleans and integer or string tuples if necessary
 def loadLists (experimentName):
     lists = []
     with open('experiments/'+experimentName, 'r') as fr:
@@ -557,8 +557,15 @@ def loadLists (experimentName):
                     lineList[i] = int(lineList[i])
                 elif (lineList[i] in ['True', 'False']):
                     lineList[i] = lineList[i] == 'True'
-                elif (lineList[i][:1] == '(' and lineList[i][1:2].isnumeric() and ',' in lineList[i]):
-                    lineList[i] = (int(lineList[i][1:-1].split(' ')[0]), int(lineList[i][1:-1].split(' ')[1]))
+                elif (lineList[i][:1] == '(' and lineList[i][-1:] == ')' and ' ' in lineList[i]):
+                    if lineList[i][1:-1].split(' ')[0].isnumeric() and lineList[i][1:-1].split(' ')[1].isnumeric():
+                        lineList[i] = (int(lineList[i][1:-1].split(' ')[0]), int(lineList[i][1:-1].split(' ')[1]))
+                    elif (lineList[i][1:-1].split(' ')[0].isnumeric() and not lineList[i][1:-1].split(' ')[1].isnumeric()):
+                        lineList[i] = (int(lineList[i][1:-1].split(' ')[0]), lineList[i][1:-1].split(' ')[1])
+                    elif (not lineList[i][1:-1].split(' ')[0].isnumeric() and lineList[i][1:-1].split(' ')[1].isnumeric()):
+                        lineList[i] = (lineList[i][1:-1].split(' ')[0], int(lineList[i][1:-1].split(' ')[1]))
+                    else:
+                        lineList[i] = (lineList[i][1:-1].split(' ')[0], lineList[i][1:-1].split(' ')[1])
             lists.append(lineList)
     return lists
 
