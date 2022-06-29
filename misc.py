@@ -557,7 +557,7 @@ def loadLists (experimentName):
                     lineList[i] = int(lineList[i])
                 elif (lineList[i] in ['True', 'False']):
                     lineList[i] = lineList[i] == 'True'
-                elif (lineList[i][:1] == '('):
+                elif (lineList[i][:1] == '(' and lineList[i][1:2].isnumeric() and ',' in lineList[i]):
                     lineList[i] = (int(lineList[i][1:-1].split(' ')[0]), int(lineList[i][1:-1].split(' ')[1]))
             lists.append(lineList)
     return lists
