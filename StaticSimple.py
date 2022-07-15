@@ -19,7 +19,7 @@ class StaticSimpleAlgo:
         Gp = nx.Graph()                     # Sparse version of graph G
         Gp.add_nodes_from(self.G.nodes())   # Initialize with only nodes and no edges
 
-        self.elemCounter = 0                        # Counter for elementary operations
+        self.elemCounter = 0                        # Counter for elementary operations, no longer used
 
         self.fullReset()
 

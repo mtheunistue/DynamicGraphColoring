@@ -17,7 +17,7 @@ class DcOrientAlgo:
         self.G = G.copy()                                         # Undirected graph G
         self.Gstar = nx.DiGraph()                                 # Directed graph Gstar, used for everything within the algorithm
 
-        self.elemCounter = 0                        # Counter for elementary operations
+        self.elemCounter = 0                        # Counter for elementary operations, no longer used
 
         self.Gstar.add_nodes_from(self.G.nodes())
         nx.set_node_attributes(self.Gstar, 0, 'color')                      # Reset all colors to 0

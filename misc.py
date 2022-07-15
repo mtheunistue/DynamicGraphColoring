@@ -220,9 +220,9 @@ def extractUpdates(G, ordering=None):
             # Update weights
             for i in range(0, len(weights)):
                 if edge[0] in edges[i]:
-                    weights[i] += 2000                             # Scaling is possible here, but has little effect
+                    weights[i] += 1                             # Scaling is possible here, but has little effect
                 if edge[1] in edges[i]:
-                    weights[i] += 2000
+                    weights[i] += 1
     elif ordering == 'prioritized':
         # Get priority for nodes   
         priorities = []

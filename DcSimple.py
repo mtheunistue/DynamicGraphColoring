@@ -19,7 +19,7 @@ class DcSimpleAlgo:
         self.changeCounter = 0                                    # Initialize changeCounter to 0
         self.p = p                                                # Probability of taking a random step
 
-        self.elemCounter = 0                        # Counter for elementary operations
+        self.elemCounter = 0                        # Counter for elementary operations, no longer used
 
         self.Gstar.add_nodes_from(self.G.nodes())
         nx.set_node_attributes(self.Gstar, 0, 'color')                      # Reset all colors to 0

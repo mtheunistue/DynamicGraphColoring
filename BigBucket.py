@@ -34,7 +34,7 @@ class BigBucketAlgo:
         self.staticColoring = {}            # Coloring at any moment
         self.bucketLevels = []
 
-        self.elemCounter = 0                        # Counter for elementary operations
+        self.elemCounter = 0                        # Counter for elementary operations, no longer used
 
         self.resetBuckets(self.G)
 

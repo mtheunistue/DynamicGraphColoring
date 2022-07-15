@@ -22,7 +22,7 @@ class StaticDynamicAlgo:
 
         self.DBB = RandomWarmUp1.WarmUp1Algo(Gp)     # Dynamic black-box algorithm to be used
 
-        self.elemCounter = 0                        # Counter for elementary operations
+        self.elemCounter = 0                        # Counter for elementary operations, no longer used
 
         self.fullReset()
 

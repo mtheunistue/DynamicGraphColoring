@@ -12,7 +12,7 @@ class WarmUp1Algo:
         self.changeCounter = 0                      # Initialize changeCounter to 0
         self.maxDegreeBound = maxDegreeBound        # Optional maximum degree bound for defining the set of available colors
 
-        self.elemCounter = 0                        # Counter for elementary operations
+        self.elemCounter = 0                        # Counter for elementary operations, no longer used
         
         nx.set_node_attributes(self.G, 0, 'color')       # Reset all colors to 0
         nx.set_node_attributes(self.G, 0, 'changed')     # Reset all change integers to 0
